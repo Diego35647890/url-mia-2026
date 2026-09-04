@@ -1,0 +1,5 @@
+﻿Fecha: 2026-09-04 10:42:43
+Respaldo completo: 198 bytes
+Incremental 01: 206 bytes
+Incremental 02: 194 bytes
+Restauracion SHA256 correcta: True
