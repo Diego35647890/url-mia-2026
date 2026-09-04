@@ -1,0 +1,139 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2314 >>
+stream
+BT /F1 10 Tf 54 750 Td 14 TL
+(# Laboratorio semana 9: acceso, indexacion, formatos e integridad) Tj T*
+() Tj T*
+(**Nombre:** Diego Licardie) Tj T*
+(**Carne:** 1251825) Tj T*
+(**Curso:** Metodos e Implementacion de Archivos) Tj T*
+() Tj T*
+(## 1. Productos: acceso y estructura) Tj T*
+() Tj T*
+(Recomendaria **acceso directo mediante un indice B-tree** sobre el codigo del) Tj T*
+(producto. El acceso directo evita recorrer los 300,000 registros uno por uno y) Tj T*
+(el B-tree mantiene las busquedas, inserciones y eliminaciones en tiempo) Tj T*
+(logaritmico. Tambien permite buscar por rangos, por ejemplo todos los precios) Tj T*
+(entre Q100 y Q200. Si el archivo se mantiene ordenado por codigo y se usa) Tj T*
+(memoria secundaria, un B-tree reduce la cantidad de accesos al disco.) Tj T*
+() Tj T*
+(## 2. Documentos: indice invertido) Tj T*
+() Tj T*
+(Un indice invertido relaciona cada palabra con las ubicaciones de los) Tj T*
+(documentos donde aparece. Primero se normaliza el texto, se eliminan palabras) Tj T*
+(vacAas y se guardan las posiciones o identificadores de documento.) Tj T*
+() Tj T*
+(Ejemplo:) Tj T*
+() Tj T*
+(```text) Tj T*
+(seguridad -> [documento_003, documento_018, documento_221]) Tj T*
+(respaldo  -> [documento_003, documento_105]) Tj T*
+(```) Tj T*
+() Tj T*
+(Una busqueda por `seguridad respaldo` consulta ambas listas y calcula su) Tj T*
+(interseccion. El resultado contiene los documentos que tienen las dos palabras,) Tj T*
+(sin leer todos los archivos almacenados.) Tj T*
+() Tj T*
+(## 3. Verificacion SHA-256) Tj T*
+() Tj T*
+(La huella SHA-256 se calcula nuevamente sobre la copia y se compara con la) Tj T*
+(huella original. Si ambas cadenas coinciden, la copia es consistente con una) Tj T*
+(probabilidad practicamente segura para este uso; si difieren, el archivo fue) Tj T*
+(alterado o se daAo durante la copia. La huella no cifra ni recupera el archivo:) Tj T*
+(solo permite detectar cambios.) Tj T*
+() Tj T*
+(En la practica se verifico la copia con `Get-FileHash` y se obtuvo el mismo) Tj T*
+(valor para el archivo original y el archivo copiado.) Tj T*
+() Tj T*
+(## 4. Respaldos necesarios) Tj T*
+() Tj T*
+(Con un respaldo completo el domingo, hay dos estrategias posibles:) Tj T*
+() Tj T*
+(- **Completo + incrementales:** cada respaldo guarda solo los cambios desde el) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2784 >>
+stream
+BT /F1 10 Tf 54 750 Td 14 TL
+(  respaldo anterior. Para recuperar el estado del jueves se restaura el) Tj T*
+(  completo del domingo y, en orden, los incrementales del lunes, martes,) Tj T*
+(  miercoles y jueves.) Tj T*
+(- **Completo + diferenciales:** cada respaldo guarda los cambios desde el) Tj T*
+(  domingo. Para recuperar el jueves se restaura el completo del domingo y solo) Tj T*
+(  el diferencial del jueves.) Tj T*
+() Tj T*
+(La estrategia incremental usa menos espacio diario, pero requiere toda la) Tj T*
+(cadena. La diferencial consume mas espacio con el paso de la semana, pero hace) Tj T*
+(la recuperacion mas sencilla y reduce los puntos de fallo. Para una empresa que) Tj T*
+(prioriza una restauracion simple elegiria completo mas diferenciales; para) Tj T*
+(restricciones fuertes de espacio elegiria completo mas incrementales.) Tj T*
+() Tj T*
+(## 5. Informacion critica con cambios diarios) Tj T*
+() Tj T*
+(Usaria una politica **3-2-1**: conservar al menos tres copias, en dos medios) Tj T*
+(distintos y una fuera del equipo o fuera del sitio. HarAa un respaldo completo) Tj T*
+(semanal, respaldos incrementales diarios y una copia cifrada fuera del sitio.) Tj T*
+(Cada respaldo debe registrar fecha, tipo, tamaAo y SHA-256; ademAs se debe) Tj T*
+(probar periAdicamente la restauracion en una carpeta aislada.) Tj T*
+() Tj T*
+(Esta estrategia limita la perdida de datos al intervalo entre respaldos,) Tj T*
+(permite recuperar versiones anteriores ante borrados o ransomware y mantiene) Tj T*
+(una copia disponible aunque falle el equipo principal. El cifrado protege la) Tj T*
+(confidencialidad y la verificacion de hash comprueba la integridad del archivo) Tj T*
+(restaurado.) Tj T*
+() Tj T*
+(## Evidencia practica) Tj T*
+() Tj T*
+(El script `generar_evidencia.ps1` crea un archivo fuente, un respaldo completo,) Tj T*
+(dos respaldos incrementales, restaura el estado final y compara las huellas) Tj T*
+(SHA-256. Los resultados quedan en `evidencia/resultado_practica.txt`.) Tj T*
+() Tj T*
+(Los archivos `respaldo_completo.zip`, `incremental_01.zip` e) Tj T*
+(`incremental_02.zip` son los respaldos generados. El archivo) Tj T*
+(`evidencia/restaurado/datos_clientes.csv` es la copia recuperada y) Tj T*
+(`evidencia/hash_comparacion.txt` documenta la comprobacion de integridad.) Tj T*
+() Tj T*
+(## Conclusion) Tj T*
+() Tj T*
+(La combinacion de acceso directo indexado, indice invertido, verificacion) Tj T*
+(SHA-256 y una politica de respaldos probada responde a necesidades diferentes:) Tj T*
+(busqueda eficiente, localizacion de texto, deteccion de alteraciones y) Tj T*
+(recuperacion ante fallos. La restauracion comprobada es necesaria porque un) Tj T*
+(respaldo que nunca se ha probado no garantiza que pueda utilizarse cuando sea) Tj T*
+(necesario.) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000117 00000 n 
+0000000243 00000 n 
+0000002609 00000 n 
+0000002735 00000 n 
+0000005571 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+5641
+%%EOF
