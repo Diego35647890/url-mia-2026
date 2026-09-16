@@ -1,0 +1,5 @@
+﻿Archivo original: C:\url-mia-2026\semana-9\lab9\datos_clientes.csv
+Archivo restaurado: C:\url-mia-2026\semana-9\lab9\evidencia\restaurado\datos_clientes.csv
+SHA256 original: 4183A86F5E64A3B5479ACE230442FA8271DCCD6CDD5C59C1470BC54B0043993F
+SHA256 restaurado: 4183A86F5E64A3B5479ACE230442FA8271DCCD6CDD5C59C1470BC54B0043993F
+Coinciden: True
