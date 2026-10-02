@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace MIA_AzureBlob
 {
@@ -13,45 +11,28 @@ namespace MIA_AzureBlob
         // Nombre del contenedor en minúsculas
         private const string containerName = "mia-archivos";
 
-        private static string GetRequiredSetting(string configKey, string environmentVariableName)
-        {
-            var valueFromEnvironment = Environment.GetEnvironmentVariable(environmentVariableName);
-            if (!string.IsNullOrWhiteSpace(valueFromEnvironment))
-            {
-                return valueFromEnvironment;
-            }
-
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", optional: true)
-                .Build();
-
-            var valueFromConfig = configuration[configKey];
-            if (!string.IsNullOrWhiteSpace(valueFromConfig))
-            {
-                return valueFromConfig;
-            }
-
-            throw new InvalidOperationException(
-                $"Falta la configuración '{configKey}'. Establécela como variable de entorno '{environmentVariableName}' " +
-                "o en appsettings.Development.json, y no la subas a GitHub.");
-        }
-
         static async Task Main(string[] args)
         {
-            string accountName = GetRequiredSetting("AzureStorage:AccountName", "AZURE_STORAGE_ACCOUNT_NAME");
-            string accountKey = GetRequiredSetting("AzureStorage:AccountKey", "AZURE_STORAGE_ACCOUNT_KEY");
+            // Carga las variables que estan en el archivo .env
+            DotNetEnv.Env.Load();
+
+            // La Connection String se lee desde una variable de entorno, no esta en el codigo
+            string? connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                Console.WriteLine("Error: no se encontro la variable AZURE_STORAGE_CONNECTION_STRING.");
+                Console.WriteLine("Verifique que exista el archivo .env con la variable.");
+                return;
+            }
 
             BlobServiceClient blobServiceClient;
             BlobContainerClient containerClient;
 
             try
             {
-                // Construcción directa con credenciales explícitas (Evita errores de formato)
-                StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
-                Uri serviceUri = new Uri($"https://{accountName}.blob.core.windows.net");
-
-                blobServiceClient = new BlobServiceClient(serviceUri, credential);
+                // Conexion usando la Connection String leida del entorno
+                blobServiceClient = new BlobServiceClient(connectionString);
                 containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
                 // Crear el contenedor si no existe de forma privada
@@ -60,7 +41,7 @@ namespace MIA_AzureBlob
             catch (Exception ex)
             {
                 Console.WriteLine($"\n[Error de conexión con Azure]: {ex.Message}");
-                Console.WriteLine("Si la clave fue regenerada en Azure Portal, vuelve a copiar la key1.");
+                Console.WriteLine("Si la clave fue regenerada en Azure Portal, vuelve a copiar la Connection String en el .env.");
                 return;
             }
 
